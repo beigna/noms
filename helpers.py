@@ -44,6 +44,10 @@ def get_accept(req):
 def get_size(req):
     w = int(req.args.get('w', 0))
     h = int(req.args.get('h', 0))
+
+    w = max(MAX_WIDTH if w > MAX_WIDTH else w, 1)
+    h = max(MAX_HEIGHT if h > MAX_HEIGHT else h, 1)
+
     return (w, h)
 
 
@@ -115,52 +119,3 @@ def get_account(access_token):
                       500)
 
     return Account(data['is_active'], data['user'])
-
-
-# - imágenes!
-
-
-class Imagenator1(object):
-
-    def __init__(self, source, width, height, strategy, img_format):
-        self._source = source
-        self._width = width
-        self._height = height
-        self._strategy = strategy
-        self._format = img_format
-
-        self._hash = sha1(
-            '{}-{}-{}-{}-{}'.format(source, width, height,
-                                    strategy, img_format).encode('utf-8')
-        ).hexdigest()
-        self._key = 'img_{}'.format(self._hash)
-
-    def run(self):
-        skip_cache = False
-        path = None
-
-        data = cache_get(redis_store, self._key)
-        if data:
-            path, mimetype = data.decode('utf-8').split('***')
-
-        if path is None:
-            if not os.path.exists(self._source):
-                self._source = 'error.jpg'
-                skip_cache = True
-
-            path, mimetype = self._generate()
-
-            if not skip_cache:
-                cache_set(redis_store, self._key,
-                          '{}***{}'.format(path, mimetype))
-
-        return path, mimetype
-
-        path = os.path.join(path, self._hash)
-        with open(path, 'wb') as fp:
-            path.save(fp, self._format, quality=90)
-
-        return path, 'image/webp' if self._format == 'WEBP' else 'image/jpeg'
-
-    def _limit(self, value, maximum):
-        return max(maximum if value > maximum else value, 1)
