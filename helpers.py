@@ -1,11 +1,14 @@
 from collections import namedtuple
 from hashlib import sha1
+from imagelib import Imagenator
 from redis.exceptions import RedisError
 from requests.exceptions import RequestException
 import json
 import os
+import os.path
 import requests
 
+import settings
 from pdi import sentry, redis_store
 
 HOST = 'https://proxyapp.desarrollo.gdn/api'
@@ -42,8 +45,8 @@ def get_accept(req):
 
 
 def get_size(req):
-    w = int(req.args.get('w', 0))
-    h = int(req.args.get('h', 0))
+    w = int(req.args.get('w', 75))
+    h = int(req.args.get('h', 75))
 
     w = max(MAX_WIDTH if w > MAX_WIDTH else w, 1)
     h = max(MAX_HEIGHT if h > MAX_HEIGHT else h, 1)
@@ -119,3 +122,38 @@ def get_account(access_token):
                       500)
 
     return Account(data['is_active'], data['user'])
+
+
+def resizer(source, strategy, target_size, img_format):
+    source = os.path.join(settings.SOURCE_IMAGES, source)
+
+    skip_cache = False
+    cache_path = None
+
+    cache_key = get_cache_key(source, strategy, target_size, img_format)
+    data = cache_get(redis_store, cache_key)
+
+    if data:
+        cache_path = data.decode('utf-8')
+
+    if cache_path is None:
+        if not os.path.isfile(source):
+            # se cambia el source por un default
+            source = 'error.jpg'
+            skip_cache = True
+
+        cache_path = get_cache_path(settings.CACHE_IMAGES, cache_key)
+
+        # -----------------------------------------
+        image = Imagenator(source)              # -
+        if strategy == 'fit':                   # -
+            image.resize_fitin(target_size)     # -
+        else:                                   # -
+            image.resize_crop(target_size, 2)   # -
+        image.save(cache_path, img_format, 90)  # -
+        # -----------------------------------------
+
+        if not skip_cache:
+            cache_set(redis_store, cache_key, cache_path)
+
+    return cache_path
