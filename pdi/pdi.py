@@ -1,10 +1,12 @@
 from flask import Flask, request, abort, send_file
 from flask_redis import FlaskRedis
 from raven.contrib.flask import Sentry
+import os
 
 import settings
 
 app = Flask(__name__)
+app.config['REDIS_URL'] = settings.REDIS
 sentry = Sentry(app, dsn=settings.SENTRY_DSN)
 redis_store = FlaskRedis(app)
 
@@ -39,4 +41,5 @@ def default(source):
         return graph_response('error.jpg', strategy, target_size, img_format)
         abort(403)
 
+    source = os.path.join(settings.SOURCE_IMAGES, source)
     return graph_response(source, strategy, target_size, img_format)

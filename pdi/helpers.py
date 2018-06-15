@@ -41,7 +41,7 @@ def get_access_token(req):
 
 
 def get_accept(req):
-    return req.headers.get('Accept')
+    return req.headers.get('Accept', '')
 
 
 def get_size(req):
@@ -125,8 +125,6 @@ def get_account(access_token):
 
 
 def resizer(source, strategy, target_size, img_format):
-    source = os.path.join(settings.SOURCE_IMAGES, source)
-
     skip_cache = False
     cache_path = None
 
