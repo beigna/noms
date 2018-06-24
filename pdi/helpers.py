@@ -1,6 +1,8 @@
 from imagelib import Imagenator
 import os
 
+import settings
+
 from app import redis_store as cache
 
 
@@ -21,7 +23,7 @@ def try_or_false(except_class, sentry):
 
 def cache_image(func_resize):
     def wrapper(*args, **kwargs):
-        img, _, remember = args
+        img, remember = args
 
         cache_key = 'img_{}'.format(img.id)
 
@@ -41,7 +43,9 @@ def cache_image(func_resize):
 
 
 @cache_image
-def resizer(img, save_to, remember):
+def resizer(img, remember):
+    save_to = image_save_to(settings.IMAGES_CACHE_DIR, img.id)
+
     image = Imagenator(img.path)
     if img.strategy == 'fit':
         image.resize_fitin(img.size)
