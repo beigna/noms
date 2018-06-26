@@ -6,21 +6,6 @@ import settings
 from app import redis_store as cache
 
 
-def try_or_false(except_class, sentry):
-    def decorator(f):
-        def wrapper(*args, **kwargs):
-            try:
-                return f(*args, **kwargs)
-
-            except except_class:
-                sentry.captureException()
-                return False
-
-        return wrapper
-
-    return decorator
-
-
 def cache_image(func_resize):
     def wrapper(*args, **kwargs):
         img, remember = args
