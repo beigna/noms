@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask = "*"
+flask-redis = "*"
+raven = {extras = ["flask"]}
+requests = "*"
+pillow-simd = "*"
+
+[dev-packages]
+pytest = "*"
+pytest-watch = "*"
+"flake8" = "*"
+
+[requires]
+python_version = "3.6"

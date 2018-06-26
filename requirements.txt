@@ -1,5 +1,0 @@
-Flask==1.0.2
-Flask-Redis==0.3.0
-Pillow==5.1.0
-raven[flask]
-requests==2.19.0

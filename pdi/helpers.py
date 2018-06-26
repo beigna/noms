@@ -3,7 +3,11 @@ import os
 
 import settings
 
-from app import redis_store as cache
+from app import redis_store as cache, sentry
+
+
+class ResizerError(Exception):
+    """Si falla el resizer"""
 
 
 def cache_image(func_resize):
@@ -31,12 +35,17 @@ def cache_image(func_resize):
 def resizer(img, remember):
     save_to = image_save_to(settings.IMAGES_CACHE_DIR, img.id)
 
-    image = Imagenator(img.path)
-    if img.strategy == 'fit':
-        image.resize_fitin(img.size)
-    else:
-        image.resize_crop(img.size, 2)
-    image.save(save_to, img.format.codec, img.quality)
+    try:
+        image = Imagenator(img.path)
+        if img.strategy == 'fit':
+            image.resize_fitin(img.size)
+        else:
+            image.resize_crop(img.size, 2)
+        image.save(save_to, img.format.codec, img.quality)
+
+    except Exception as e:
+        sentry.captureException()
+        raise ResizerError(e)
 
     return save_to
 
