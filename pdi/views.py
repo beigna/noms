@@ -32,9 +32,9 @@ def default(source):
 
     if None in (req_img.strategy, req_img.quality):
         # Loggear?
-        req_img.path = settings.IMAGE_400
         req_img.strategy = 'crop'
         req_img.quality = 60
+        req_img.path = settings.IMAGE_400
         return graph_response(req_img)
 
     if req_img.path is None:
