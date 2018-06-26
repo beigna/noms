@@ -74,8 +74,6 @@ def get_quality(req):
         return None
     return q
 
-# hugo me bardeó por no usar excepciones, tiene razón
-
 
 def get_strategy(req):
     s = req.args.get('s', '')
