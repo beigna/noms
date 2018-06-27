@@ -2,7 +2,7 @@ from collections import namedtuple
 from hashlib import sha1
 import os.path
 
-import settings
+from app import app
 
 
 class ImgRequest(object):
@@ -53,11 +53,11 @@ class ImgSize(ImgSizeBase):
 
 
 def get_size(req):
-    w = int(req.args.get('w', settings.DEFAULT_WIDTH))
-    h = int(req.args.get('h', settings.DEFAULT_HEIGHT))
+    w = int(req.args.get('w', app.config['DEFAULT_WIDTH']))
+    h = int(req.args.get('h', app.config['DEFAULT_HEIGHT']))
 
-    w = max(settings.MAX_WIDTH if w > settings.MAX_WIDTH else w, 1)
-    h = max(settings.MAX_HEIGHT if h > settings.MAX_HEIGHT else h, 1)
+    w = max(app.config['MAX_WIDTH'] if w > app.config['MAX_WIDTH'] else w, 1)
+    h = max(app.config['MAX_HEIGHT'] if h > app.config['MAX_HEIGHT'] else h, 1)
 
     return ImgSize(w, h)
 
@@ -69,7 +69,7 @@ def get_format(req):
 
 
 def get_quality(req):
-    q = int(req.args.get('q', settings.DEFAULT_QUALITY))
+    q = int(req.args.get('q', app.config['DEFAULT_QUALITY']))
     if q < 0 or q > 100:
         return None
     return q
@@ -83,7 +83,7 @@ def get_strategy(req):
 
 
 def get_source(source):
-    source = os.path.join(settings.IMAGES_SOURCE_DIR, source)
+    source = os.path.join(app.config['IMAGES_SOURCE_DIR'], source)
     if os.path.isfile(source):
         return source
     return None

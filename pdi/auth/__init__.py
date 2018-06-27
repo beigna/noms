@@ -1,3 +1,3 @@
 from importlib import import_module
-from settings import AUTH_BACKEND
-acl = import_module(AUTH_BACKEND)
+from app import app
+acl = import_module(app.config['AUTH_BACKEND'])

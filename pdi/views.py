@@ -4,7 +4,6 @@ from helpers import resizer, ResizerError
 from utils import parse_request
 
 import auth
-import settings
 
 
 def graph_response(img, remember=True):
@@ -19,21 +18,21 @@ def default(source):
     if None in (req_img.strategy, req_img.quality):
         req_img.strategy = 'crop'
         req_img.quality = 60
-        req_img.path = settings.IMAGE_400
+        req_img.path = app.config['IMAGE_400']
 
     if req_img.path is None:
-        req_img.path = settings.IMAGE_404
+        req_img.path = app.config['IMAGE_404']
 
     if not auth.acl.has_permission(request):
-        req_img.path = settings.IMAGE_401
+        req_img.path = app.config['IMAGE_401']
 
     try:
         return graph_response(req_img)
 
     except ResizerError:
-        req_img.path = settings.IMAGE_500
+        req_img.path = app.config['IMAGE_500']
         return graph_response(req_img)
 
     except Exception:
         sentry.captureException()
-        return send_file(settings.IMAGE_500, mimetype='image/jpeg')
+        return send_file(app.config['IMAGE_500'], mimetype='image/jpeg')

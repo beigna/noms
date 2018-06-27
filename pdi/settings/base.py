@@ -11,14 +11,16 @@ MAX_HEIGHT = 3000
 IMAGE_400 = './static/400.jpg'
 IMAGE_401 = './static/401.jpg'
 IMAGE_404 = './static/404.jpg'
+IMAGE_500 = './static/500.jpg'
 
 
 # Auth
 AUTH_BACKEND = 'auth.none'
+AUTH_BACKEND_HOST = None
 
 # Cosas para Flask
-FLASK_SENTRY_DSN = ''  # noqa
-FLASK_REDIS_URL = 'redis://localhost:6379/0'
+SENTRY_DSN = None  # noqa
+REDIS_URL = 'redis://localhost:6379/0'
 
 # Source & Cache paths
 IMAGES_SOURCE_DIR = '/tmp'

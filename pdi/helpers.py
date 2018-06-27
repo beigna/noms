@@ -1,9 +1,7 @@
 from imagelib import Imagenator
 import os
 
-import settings
-
-from app import redis_store as cache, sentry
+from app import redis_store as cache, sentry, app
 
 
 class ResizerError(Exception):
@@ -33,7 +31,7 @@ def cache_image(func_resize):
 
 @cache_image
 def resizer(img, remember):
-    save_to = image_save_to(settings.IMAGES_CACHE_DIR, img.id)
+    save_to = image_save_to(app.config['IMAGES_CACHE_DIR'], img.id)
 
     try:
         image = Imagenator(img.path)
